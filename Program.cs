@@ -33,7 +33,28 @@ namespace WebCrawler1
                 var html2 = await httpClient.GetStringAsync(sinopse);
                 htmlDocument2.LoadHtml(html2);
                 var span = htmlDocument2.DocumentNode.Descendants("span").Where(node => node.GetAttributeValue("itemprop", "").Equals("description")).ToList();
-
+                int aux2 = 0;
+                string image = tr.Descendants("img").FirstOrDefault().ChildAttributes("data-srcset").FirstOrDefault().Value;
+                for (int i = 0; i < image.Length; i++)
+                {
+                    if (image[i] == ',')
+                    {
+                        break;
+                    }
+                    aux2++;
+                }
+                
+                image = image.Remove(0, aux2+2);
+                aux2 = 0;
+                for (int i = 0; i < image.Length; i++)
+                {
+                    if (image[i] == ' ')
+                    {
+                        break;
+                    }
+                    aux2++;
+                }
+                image = image.Remove(aux2,3);
                 var manga = new Manga
                 {
 
@@ -42,7 +63,7 @@ namespace WebCrawler1
                     Nota = tr.Descendants("div").Where(node => node.GetAttributeValue("class", "").Equals("js-top-ranking-score-col di-ib al")).FirstOrDefault().InnerText,
                     //Link = tr.Descendants("a").FirstOrDefault().GetAttributeValue("href", " "),
                     //Information = tr.Descendants("div").Where(node => node.GetAttributeValue("class", "").Equals("information di-ib mt4")).FirstOrDefault().InnerText,
-                    Imagem = tr.Descendants("img").FirstOrDefault().ChildAttributes("data-srcset").FirstOrDefault().Value,
+                    Imagem = image,
                     Resumo = span[0].InnerText
                 };
 
@@ -57,7 +78,7 @@ namespace WebCrawler1
                     );
                 Console.WriteLine("Score: " + tr.Descendants("div").Where(node => node.GetAttributeValue("class", "").Equals("js-top-ranking-score-col di-ib al")).FirstOrDefault().InnerText
                     );
-                Console.WriteLine("Link das imagens: " + tr.Descendants("img").FirstOrDefault().ChildAttributes("data-srcset").FirstOrDefault().Value
+                Console.WriteLine("Imagem :" + image
                     );
                 Console.WriteLine(tr.Descendants("div").Where(node => node.GetAttributeValue("class", "").Equals("information di-ib mt4")).FirstOrDefault().InnerText
                     );
